@@ -138,7 +138,7 @@ def generate_features(args):
     bam_to_process = pysam.AlignmentFile(args.bamFile)
     txt_out = os.path.join(args.outdir,args.outFile)
     txt_fh = open(txt_out, "wb")
-    txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\mismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
+    txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
 # iterate over statistics, one record at a time
     for record in vcf_reader:
         chromosome = record.CHROM
@@ -152,8 +152,7 @@ def generate_features(args):
             start = position -1
             end = position + 1
         for rec in pysamstats.stat_coverage(bam_to_process, chrom=chromosome, start=start, end=end):
-            print  args.sampleName, chromosome, ref, alt, "\n"
-            print rec
+            print  args.sampleName, chromosome, ref, alt, rec['chrom'], rec['pos'], rec['reads_all'], rec['reads_pp'], rec['reads_mate_unmapped'],"\n"
             #print rec['chrom'], rec['pos'], "\n" 
             #print rec['reads_all'], rec['A/C/T/G/N'], "\n"
 #             rec['reads_pp'], rec['reads_pp_fwd'], rec['reads_pp_rev'], 
