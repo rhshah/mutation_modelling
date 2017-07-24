@@ -136,20 +136,25 @@ def validate_inputs(args):
 def generate_features(args):
     vcf_reader = vcf.Reader(open(args.inputVcf, 'r'))
     bam_to_process = pysam.AlignmentFile(args.bamFile)
+    txt_out = os.path.join(args.outdir,args.outFile)
+    txt_fh = open(txt_out, "wb")
+    txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\mismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
 # iterate over statistics, one record at a time
     for record in vcf_reader:
         chromosome = record.CHROM
         position = int(record.POS)
-        if(len(str(record.REF)) > len(str(record.ALT))):
+        ref = record.REF
+        alt = record.ALT[0]
+        if(len(str(ref)) > len(str(alt))):
             start = position
             end = position + 2
         else:
             start = position -1
             end = position + 1
         for rec in pysamstats.stat_coverage(bam_to_process, chrom=chromosome, start=start, end=end):
-            print  args.sampleName, chromosome, record.REF, record.ALT, "\n"
+            print  args.sampleName, chromosome, ref, alt, "\n"
             print rec['chrom'], rec['pos'], "\n" 
-            print rec['reads_all'], rec['reads_all_fwd'], rec['reads_all_rev'], "\n"
+            print rec['reads_all'], rec['A'], rec['A/C/T/G/N'], "\n"
 #             rec['reads_pp'], rec['reads_pp_fwd'], rec['reads_pp_rev'], 
 #             rec['reads_mate_unmapped'], rec['reads_mate_unmapped_fwd'], rec['reads_mate_unmapped_rev'], 
 #             rec['reads_mate_other_chr'], rec['reads_mate_other_chr_fwd'], rec['reads_mate_other_chr_rev'],
@@ -170,8 +175,8 @@ def generate_features(args):
 #             rec['mean_tlen'], rec['mean_tlen_pp'], rec['rms_tlen'], rec['rms_tlen_pp'], rec['std_tlen'], rec['std_tlen_pp'],  
 #             rec['reads_mapq0'], rec['rms_mapq'], rec['rms_mapq_pp'], rec['max_mapq'], rec['max_mapq_pp'], 
 #             rec['rms_baseq'], rec['rms_baseq_matches'], rec['rms_baseq_matches_pp'], rec['rms_baseq_mismatches'], rec['rms_baseq_mismatches_pp']
-            
-    return()
+    txt_fh.close()       
+    return
 # Run the whole script
 if __name__ == "__main__":
     start_time = time.time()
