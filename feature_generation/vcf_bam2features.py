@@ -148,8 +148,8 @@ def generate_features(args):
             end = position + 1
         for rec in pysamstats.stat_coverage(bam_to_process, chrom=chromosome, start=start, end=end):
             print  args.sampleName, chromosome, record.REF, record.ALT, "\n"
-#             rec['chrom'], rec['pos'], 
-#             rec['reads_all'], rec['reads_all_fwd'], rec['reads_all_rev'], 
+            print rec['chrom'], rec['pos'], "\n" 
+            print rec['reads_all'], rec['reads_all_fwd'], rec['reads_all_rev'], "\n"
 #             rec['reads_pp'], rec['reads_pp_fwd'], rec['reads_pp_rev'], 
 #             rec['reads_mate_unmapped'], rec['reads_mate_unmapped_fwd'], rec['reads_mate_unmapped_rev'], 
 #             rec['reads_mate_other_chr'], rec['reads_mate_other_chr_fwd'], rec['reads_mate_other_chr_rev'],
