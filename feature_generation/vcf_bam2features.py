@@ -68,6 +68,7 @@ def main():
     parser = argparse.ArgumentParser(prog='vcf_bam2features.py', description='This module gets the detailed bam information for a given chromosome, start, end, reference allele and alternate allele and 1bp flanking from a vcf', usage='%(prog)s [options]')
     parser.add_argument("-o", "--output-file", action="store", dest="outFile", type=str, required=True, metavar='OutFile', help="Name of the output file")
     parser.add_argument("-b", "--bam-file", action="store", dest="bamFile", type=str, required=True, metavar='BamFile', help="Full Path to the bam file to be used for feature generation")
+    parser.add_argument("-r", "--ref-file", action="store", dest="refFile", type=str, required=True, metavar='refFile', help="Full Path to the reference genome file to be used for feature generation")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", help="make lots of noise")
     parser.add_argument("-d", "--output-dir", action="store", dest="outdir", type=str, required=False, metavar='/somepath/output', help="Full Path to the output directory.")
     parser.add_argument("-s", "--sample-name", action="store", dest="sampleName", type=str, required=False, metavar='SomeID', help="Sample ID for the bam file, if not provided the prefix of the bam file will be used")
@@ -151,7 +152,7 @@ def generate_features(args):
         else:
             start = position -1
             end = position + 1
-        for rec in pysamstats.stat_variation_strand(bam_to_process, chrom=chromosome, start=start, end=end):
+        for rec in pysamstats.stat_variation_strand(bam_to_process, args.refFile, chrom=chromosome, start=start, end=end):
             #print  args.sampleName, chromosome, ref, alt, rec['chrom'], rec['pos'], rec['reads_all'], rec['reads_pp'], rec['reads_mate_unmapped'],"\n"
             print rec
             #print rec['chrom'], rec['pos'], "\n" 
