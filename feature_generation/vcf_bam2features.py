@@ -147,30 +147,29 @@ def generate_features(args):
             start = position -1
             end = position + 1
         for rec in pysamstats.stat_coverage(bam_to_process, chrom=chromosome, start=start, end=end):
-            print \
-            args.sampleName, chromosome, record.REF, record.ALT,\
-            rec['chrom'], rec['pos'], \
-            rec['reads_all'], rec['reads_all_fwd'], rec['reads_all_rev'], \
-            rec['reads_pp'], rec['reads_pp_fwd'], rec['reads_pp_rev'], \
-            rec['reads_mate_unmapped'], rec['reads_mate_unmapped_fwd'], rec['reads_mate_unmapped_rev'], \
-            rec['reads_mate_other_chr'], rec['reads_mate_other_chr_fwd'], rec['reads_mate_other_chr_rev'],\
-            rec['reads_mate_same_strand'], rec['reads_mate_same_strand_fwd'], rec['reads_mate_same_strand_rev'],\
-            rec['reads_faceaway'], rec['reads_faceaway_fwd'], rec['reads_faceaway_rev'],\
-            rec['reads_softclipped'], rec['reads_softclipped_fwd'], rec['reads_softclipped_rev'],\
-            rec['reads_duplicate'], rec['reads_duplicate_fwd'], rec['reads_duplicate_rev'],\
-            rec['gc'], \
-            rec['matches'], rec['matches_pp'], \
-            rec['mismatches'], rec['mismatches_pp'], \
-            rec['deletions'], rec['deletions_pp'], \
-            rec['insertions'], rec['insertions_pp'], \
-            rec['A'], rec['A_pp'], \
-            rec['C'], rec['C_pp'], \
-            rec['T'], rec['T_pp'], \
-            rec['G'], rec['G_pp'], \
-            rec['N'], rec['N_pp'],\
-            rec['mean_tlen'], rec['mean_tlen_pp'], rec['rms_tlen'], rec['rms_tlen_pp'], rec['std_tlen'], rec['std_tlen_pp'],\
-            rec['reads_mapq0'], rec['rms_mapq'], rec['rms_mapq_pp'], rec['max_mapq'], rec['max_mapq_pp'], \
-            rec['rms_baseq'], rec['rms_baseq_matches'], rec['rms_baseq_matches_pp'], rec['rms_baseq_mismatches'], rec['rms_baseq_mismatches_pp']
+            print  args.sampleName, chromosome, record.REF, record.ALT, "\n"
+#             rec['chrom'], rec['pos'], 
+#             rec['reads_all'], rec['reads_all_fwd'], rec['reads_all_rev'], 
+#             rec['reads_pp'], rec['reads_pp_fwd'], rec['reads_pp_rev'], 
+#             rec['reads_mate_unmapped'], rec['reads_mate_unmapped_fwd'], rec['reads_mate_unmapped_rev'], 
+#             rec['reads_mate_other_chr'], rec['reads_mate_other_chr_fwd'], rec['reads_mate_other_chr_rev'],
+#             rec['reads_mate_same_strand'], rec['reads_mate_same_strand_fwd'], rec['reads_mate_same_strand_rev'],
+#             rec['reads_faceaway'], rec['reads_faceaway_fwd'], rec['reads_faceaway_rev'],
+#             rec['reads_softclipped'], rec['reads_softclipped_fwd'], rec['reads_softclipped_rev'],
+#             rec['reads_duplicate'], rec['reads_duplicate_fwd'], rec['reads_duplicate_rev'],
+#             rec['gc'], 
+#             rec['matches'], rec['matches_pp'], 
+#             rec['mismatches'], rec['mismatches_pp'], 
+#             rec['deletions'], rec['deletions_pp'], 
+#             rec['insertions'], rec['insertions_pp'], 
+#             rec['A'], rec['A_pp'], 
+#             rec['C'], rec['C_pp'], 
+#             rec['T'], rec['T_pp'], 
+#             rec['G'], rec['G_pp'], 
+#             rec['N'], rec['N_pp'],
+#             rec['mean_tlen'], rec['mean_tlen_pp'], rec['rms_tlen'], rec['rms_tlen_pp'], rec['std_tlen'], rec['std_tlen_pp'],  
+#             rec['reads_mapq0'], rec['rms_mapq'], rec['rms_mapq_pp'], rec['max_mapq'], rec['max_mapq_pp'], 
+#             rec['rms_baseq'], rec['rms_baseq_matches'], rec['rms_baseq_matches_pp'], rec['rms_baseq_mismatches'], rec['rms_baseq_mismatches_pp']
             
     return()
 # Run the whole script
