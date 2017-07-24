@@ -57,7 +57,7 @@ except ImportError:
 
 
 try:
-    import vcf as vcfpackage
+    import vcf
 except ImportError:
     logger.fatal("vcf_bam2features: pyvcf is not installed, please install pyvcf as it is required to run the mapping. pyvcf version == 0.6.7")
     sys.exit(1)
