@@ -76,6 +76,7 @@ def main():
 	   
     args = validate_inputs(args)
     
+    generate_features(args)
     if(args.verbose):
         logger.info("vcf_bam2features: Finished generating flanking sequence")
         #logger.info("vcf_bam2features: Flanking sequence is written in %s", outfile)
