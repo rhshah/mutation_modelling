@@ -140,6 +140,8 @@ def generate_features(args):
     vcf_reader = vcf.Reader(open(args.inputVcf, 'r'))
     bam_to_process = pysam.AlignmentFile(args.bamFile)
     txt_out = os.path.join(args.outdir,args.outFile)
+    count = 0
+    vc_count= 0
     #txt_fh = open(txt_out, "wb")
     #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
     rec_dict_list = []
@@ -151,18 +153,22 @@ def generate_features(args):
         position = int(record.POS)
         ref = record.REF
         alt = record.ALT[0]
-        for rec in pysamstats.stat_variation_strand(bam_to_process, args.refFile, chrom=chromosome, start=position-1, end=position+1,truncate=True):
+        for rec in pysamstats.stat_variation_strand(bam_to_process, args.refFile, chrom=chromosome, start=position-1, end=position,truncate=True):
             rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
             rec = MyOrderedDict(rec)
             #rec.prepend('Tumor_Seq_Allele1',alt)
             #rec.prepend('Reference_Allele',ref)
-            #rec.prepend('Start_Position',position)
+            rec['pos']=position
             rec.prepend('Tumor_Sample_Barcode',args.sampleName)
             #print rec
-            keys=rec.keys()
-            print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
+            if(count == 0):
+                keys=rec.keys()
+            #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
             rec_dict_list.append(rec)
+            count = count + 1
+        vc_count = vc_count + 1
     #Write output
+    print "Total Count in VCF:",vc_count,"\n","Total Count in pysam:",count,"\n","Total Record in dict:", len(rec_dict_list)
     with open(txt_out, 'wb') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
         dict_writer.writeheader()
