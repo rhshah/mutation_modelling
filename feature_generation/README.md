@@ -41,6 +41,12 @@ optional arguments:
                         Minimum Base Quality
 ```
 
+#### Example
+
+```
+python vcf_bam2features.py -b /path/to/some.bam -v -d /home/shahr2/virtualenv/mutation_modelling/ -s AX279423-T -i /path/to/some.vcf -o test1 -r /path/to/genome.fasta -p 20 -mapq 0 -baseq 0 
+```
+
 #### Output
 It will produce 5 files.
 1. prefix_variant-stats.txt
