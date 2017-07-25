@@ -82,7 +82,7 @@ def main():
 	   
     args = validate_inputs(args)
     
-    generate_features(args.inputVcf,args.bamFile,args.refFile,args.outdir,args.outfile,args.processors)
+    generate_features(args.inputVcf,args.bamFile,args.refFile,args.outdir,args.outFile,args.processors)
     if(args.verbose):
         logger.info("vcf_bam2features: Finished generating flanking sequence")
         #logger.info("vcf_bam2features: Flanking sequence is written in %s", outfile)
@@ -153,9 +153,9 @@ def validate_inputs(args):
             logger.info("vcf_bam2features: %s is a string and will be used in output file", args.sampleName)
     
     return(args)
-def generate_features(inputVcf,bamFile,refFile,outdir,outfile,processors):
+def generate_features(inputVcf,bamFile,refFile,outdir,outFile,processors):
     vcf_reader = vcf.Reader(open(inputVcf, 'r'))
-    txt_out = os.path.join(arg.outdir,arg.outFile)
+    txt_out = os.path.join(outdir,outFile)
     output = mp.Queue()
     #count = 0
     #vc_count= 0
