@@ -165,7 +165,7 @@ def generate_features(arg):
     rec_dict_list = []
     #iterate over statistics, one record at a time
     pool = mp.Pool(processes=arg.processors)
-    results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
+    results = pool.apply_async(run_pysamstats, args=[bamFile,refFile,record], for record in vcf_reader)
     rec_dict_list = [p.get() for p in results]
     #vc_count = vc_count + 1
     #Write output
