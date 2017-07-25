@@ -176,7 +176,8 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
                            for record in vcf_reader)
     print "typeof",type(rec_variation_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_variation_df_list))
-    df1 = pd.concat(rec_variation_df_list,axis=1)
+    df1 = pd.concat(rec_variation_df_list,axis=1,ignore_index=True)
+    df1 = df1.resent_index(drop=True)
     df1.to_csv(txt_out,sep="\t")
     
     rec_baseq_df_list = []
@@ -185,17 +186,19 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
                            for record in vcf_reader)
     print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_baseq_df_list))
-    df2 = pd.concat(rec_variation_dict_list,axis=1)
+    df2 = pd.concat(rec_variation_dict_list,axis=1,ignore_index=True)
+    df2 = df2.resent_index(drop=True)
     df2.to_csv(txt_out,sep="\t")
     
     rec_mapq_df_list = []
     #iterate over statistics, one record at a time
-    rec_mapq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
+    rec_mapq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_mapq_df_list))
-    df3 = pd.concat(rec_variation_dict_list,axis=1)
-    df3.to_csv(txt_out,sep="\t")
+    df3 = pd.concat(rec_variation_dict_list,axis=1,ignore_index=True)
+    df3 = df3.resent_index(drop=True)
+    df3.to_csv(txt_out,sep="\t",ignore_index=True)
     #with open(txt_out, 'wb') as output_file:
     #    dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
     #    dict_writer.writeheader()
