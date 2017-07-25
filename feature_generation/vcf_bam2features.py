@@ -229,8 +229,8 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,record):
         end = position
     for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, one_based=True, truncate=True):
         rec['alt'] = alt
-        rec['pos']=position
-        rec['Tumor_Sample_Barcode']=sampleName
+        rec['pos'] = position
+        rec['Tumor_Sample_Barcode'] = sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
@@ -249,8 +249,8 @@ def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
         end = position 
     for rec in pysamstats.stat_baseq_ext(bam_to_process, refFile, chrom=chromosome, start=start, end=end,one_based=True,truncate=True):
         rec['alt'] = alt
-        rec['pos']=position
-        rec['Tumor_Sample_Barcode']=sampleName
+        rec['pos'] = position
+        rec['Tumor_Sample_Barcode'] = sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
@@ -269,8 +269,8 @@ def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
         end = position 
     for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end,one_based=True,truncate=True):
         rec['alt'] = alt
-        rec['pos']=position
-        rec['Tumor_Sample_Barcode']=sampleName
+        rec['pos'] = position
+        rec['Tumor_Sample_Barcode'] = sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
