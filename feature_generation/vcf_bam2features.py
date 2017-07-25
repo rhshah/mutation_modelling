@@ -13,11 +13,21 @@ Description: This module gets the detailed bam information for a given chromosom
 ::Input::
 vcf: location of vcf file for variant sites
 bam: bam file from which features are to be generated
+ref: reference file
 ouput_dir: out directory if not given current working directory
-output_file: output file
+output_file_prefix: prefix for output file
+sampleName: Name of the sample
+mapq: Minimum mapping quality
+baseq: Minimum base quality
+processors: Number of processors to use to parallelize
+
 ::Output::
-
-
+It will produce 5 files.
+1. prefix_variant-stats.txt
+2. prefix_baseq-stats.txt
+3. prefix_mapq-stats.txt
+4. prefix_gc-stats.txt
+5. prefix_merged-stats.txt which is essentially combination of all
 ::Example Run::
 ```
 python vcf_bam2features.py 
@@ -198,7 +208,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     # pp.pprint(rec_variation_dict_list[0:30])
     # logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
     rec_variation_dict_list = [x for x in rec_variation_dict_list if x is not None]
-    logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
+    logger.info("Total Records in list of variation dict:%s", len(rec_variation_dict_list))
     df1 = pd.DataFrame.from_dict(rec_variation_dict_list)
     mdf1 = pd.DataFrame.copy(df1)
     df1.to_csv(txt_out1, sep="\t", index=False)
@@ -209,7 +219,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     # print "typeof",type(rec_baseq_df_list),"\n"
     # logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     rec_baseq_dict_list = [x for x in rec_baseq_dict_list if x is not None]
-    logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
+    logger.info("Total Records in list of baseq dict:%s", len(rec_baseq_dict_list))
     df2 = pd.DataFrame.from_dict(rec_baseq_dict_list)
     mdf2 = pd.DataFrame.copy(df2)
     df2.to_csv(txt_out2, sep="\t", index=False)
@@ -220,7 +230,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     # print "typeof",type(rec_mapq_df_list),"\n"
     # logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
     rec_mapq_dict_list = [x for x in rec_mapq_dict_list if x is not None]
-    logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
+    logger.info("Total Records in list of mapq dict:%s", len(rec_mapq_dict_list))
     df3 = pd.DataFrame(rec_mapq_dict_list)
     mdf3 = pd.DataFrame.copy(df3)
     df3.to_csv(txt_out3, sep="\t", index=False)
@@ -231,12 +241,12 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     # print "typeof",type(rec_gc_df_list),"\n"
     # logger.info("Total Record in list of gc dict:%s", len(rec_gc_dict_list))
     rec_gc_dict_list = [x for x in rec_gc_dict_list if x is not None]
-    logger.info("Total Record in list of gc dict:%s", len(rec_gc_dict_list))
+    logger.info("Total Records in list of gc dict:%s", len(rec_gc_dict_list))
     df4 = pd.DataFrame(rec_gc_dict_list)
     mdf4 = pd.DataFrame.copy(df4)
     df4.to_csv(txt_out4, sep="\t", index=False)
     # MERGE
-    df5 = mdf1.join(mdf2).join(mdf3).join(mdf4)
+    df5 = mdf1.join(mdf2,lsuffix='variant',rsuffix='baseq').join(mdf3,lsuffix='baseq',rsuffix='mapq').join(mdf4,lsuffix='mapq',rsuffix='gc')
     #df5 = pd.merge(mdf1, mdf2, mdf3, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt'])
     df5.to_csv(txt_out5, sep="\t", index=False)
     return
