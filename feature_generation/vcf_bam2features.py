@@ -44,6 +44,7 @@ import glob
 import textwrap
 import csv
 import collections
+import copy
 
 logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
