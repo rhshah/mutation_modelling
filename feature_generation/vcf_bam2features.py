@@ -167,9 +167,9 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     vcf_reader_a = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_b = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_c = vcf.Reader(open(inputVcf, 'r'))
-    txt_out1 = os.path.join(outdir,outFile + "_variation.txt")
-    txt_out2 = os.path.join(outdir,outFile + "_baseq.txt")
-    txt_out3 = os.path.join(outdir,outFile + "_mapq.txt")
+    txt_out1 = os.path.join(outdir,outFile + "_variant_stats.txt")
+    txt_out2 = os.path.join(outdir,outFile + "_baseq_stats.txt")
+    txt_out3 = os.path.join(outdir,outFile + "_mapq_stats.txt")
     #rec_variation_df_list = []
     #iterate over statistics, one record at a time
     rec_variation_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
@@ -220,11 +220,11 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,record):
     ref = record.REF
     alt = record.ALT[0]
     if(len(str(ref)) > len(str(alt))):
+        start = position + 1
+        end = position + 2
+    else:
         start = position
         end = position + 1
-    else:
-        start = position - 1
-        end = position
     for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, one_based=True, truncate=True):
         rec['alt'] = alt
         rec['pos'] = position
@@ -240,11 +240,11 @@ def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
     ref = record.REF
     alt = record.ALT[0]
     if(len(str(ref)) > len(str(alt))):
+        start = position + 1
+        end = position + 2
+    else:
         start = position
         end = position + 1
-    else:
-        start = position - 1
-        end = position 
     for rec in pysamstats.stat_baseq_ext(bam_to_process, refFile, chrom=chromosome, start=start, end=end,one_based=True,truncate=True):
         rec['alt'] = alt
         rec['pos'] = position
@@ -260,11 +260,11 @@ def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
     ref = record.REF
     alt = record.ALT[0]
     if(len(str(ref)) > len(str(alt))):
+        start = position + 1
+        end = position + 2
+    else:
         start = position
         end = position + 1
-    else:
-        start = position - 1
-        end = position 
     for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end,one_based=True,truncate=True):
         rec['ref'] = ref
         rec['alt'] = alt
