@@ -182,9 +182,12 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,baseq,m
     vcf_reader_a = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_b = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_c = vcf.Reader(open(inputVcf, 'r'))
+    vcf_reader_d = vcf.Reader(open(inputVcf, 'r'))
     txt_out1 = os.path.join(outdir,outFile + "_variant_stats.txt")
     txt_out2 = os.path.join(outdir,outFile + "_baseq_stats.txt")
     txt_out3 = os.path.join(outdir,outFile + "_mapq_stats.txt")
+    txt_out4 = os.path.join(outdir,outFile + "_gc_stats.txt")
+    txt_out5 = os.path.join(outdir,outFile + "_merged_stats.txt")
     #iterate over statistics, one record at a time
     rec_variation_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,baseq,mapq,record)
                            for record in vcf_reader_a)
@@ -197,8 +200,9 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,baseq,m
     rec_variation_dict_list = [x for x in rec_variation_dict_list if x is not None]
     logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
     df1 = pd.DataFrame.from_dict(rec_variation_dict_list)
+    mdf1 = pd.copy(df1)
     df1.to_csv(txt_out1,sep="\t",index=False)
-    
+    #BASEQ
     #iterate over statistics, one record at a time
     rec_baseq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,baseq,mapq,sampleName,record)
                            for record in vcf_reader_b)
@@ -207,8 +211,9 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,baseq,m
     rec_baseq_dict_list = [x for x in rec_baseq_dict_list if x is not None]
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     df2 = pd.DataFrame.from_dict(rec_baseq_dict_list)
+    mdf2 = pd.copy(df2)
     df2.to_csv(txt_out2,sep="\t",index=False)
-    
+    #MAPQ
     #iterate over statistics, one record at a time
     rec_mapq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,baseq,mapq,sampleName,record)
                            for record in vcf_reader_c)
@@ -217,7 +222,22 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,baseq,m
     rec_mapq_dict_list = [x for x in rec_mapq_dict_list if x is not None]
     logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
     df3 = pd.DataFrame(rec_mapq_dict_list)
+    mdf3 = pd.copy(df3)
     df3.to_csv(txt_out3,sep="\t",index=False)
+    #GC
+    #iterate over statistics, one record at a time
+    rec_gc_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_gc)(bamFile,refFile,baseq,gc,sampleName,record)
+                           for record in vcf_reader_d)
+    #print "typeof",type(rec_gc_df_list),"\n"
+    #logger.info("Total Record in list of gc dict:%s", len(rec_gc_dict_list))
+    rec_gc_dict_list = [x for x in rec_gc_dict_list if x is not None]
+    logger.info("Total Record in list of gc dict:%s", len(rec_gc_dict_list))
+    df4 = pd.DataFrame(rec_gc_dict_list)
+    mdf4 = pd.copy(df4)
+    df4.to_csv(txt_out4,sep="\t",index=False)
+    #MERGE
+    df5 = pd.merge(mdf1, mdf2, mdf3, mdf4, on=['Tumor_Sample_Barcode','chrom','pos','ref','alt'])
+    df5.to_csv(txt_out5,sep="\t",index=False)
     return
 
 #Run PySamStats
@@ -235,6 +255,7 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,baseq,mapq,record):
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
+#BASEQ
 def run_pysamstats_baseq(bamFile,refFile,baseq,mapq,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
     keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','rms_baseq','rms_baseq_fwd','rms_baseq_rev','rms_baseq_pp','rms_baseq_pp_fwd','rms_baseq_pp_rev','rms_baseq_matches','rms_baseq_matches_fwd','rms_baseq_matches_rev','rms_baseq_matches_pp','rms_baseq_matches_pp_fwd','rms_baseq_matches_pp_rev','rms_baseq_mismatches','rms_baseq_mismatches_fwd','rms_baseq_mismatches_rev','rms_baseq_mismatches_pp','rms_baseq_mismatches_pp_fwd','rms_baseq_mismatches_pp_rev']
@@ -249,6 +270,7 @@ def run_pysamstats_baseq(bamFile,refFile,baseq,mapq,sampleName,record):
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
+#MAPQ
 def run_pysamstats_mapq(bamFile,refFile,baseq,mapq,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
     keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
@@ -264,6 +286,23 @@ def run_pysamstats_mapq(bamFile,refFile,baseq,mapq,sampleName,record):
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
+#GC
+def run_pysamstats_gc(bamFile,refFile,baseq,mapq,sampleName,record):
+    bam_to_process = pysam.AlignmentFile(bamFile)
+    keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_pp','gc']
+    chromosome = record.CHROM
+    position = record.POS
+    ref = record.REF
+    alt = record.ALT[0]
+    for rec in pysamstats.stat_coverage_gc(bam_to_process, refFile, chrom=chromosome, start=position, end=None, min_mapq=mapq, min_baseq=baseq, no_del=False, no_dup=False, window_size=50, window_offset=10, one_based=True, truncate=True):
+        rec['ref'] = ref
+        rec['alt'] = alt
+        rec['pos'] = position
+        rec['Tumor_Sample_Barcode'] = sampleName
+        rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
+        #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
+        return(rec)
+
 
 # Run the whole script
 if __name__ == "__main__":
