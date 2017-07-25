@@ -249,10 +249,10 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     df4.to_csv(txt_out4, sep="\t", index=False)
     # MERGE
     #dfj1 = mdf1.join(mdf2,rsuffix='_baseq').join(mdf3,rsuffix='_mapq').join(mdf4,rsuffix='_gc')
-    mdfj1 = pd.merge_ordered(mdf1, mdf2, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'], how='inner')
-    mdfj2 = pd.merge_ordered(mdfj1, mdf3, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'],  how='inner')
-    df5 = pd.merge_ordered(mdfj2, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'], how='inner')
-    #df5 = pd.concat(mdf1,mdf2,mdf3,mdf4,axis=1)
+    #mdfj1 = pd.merge_ordered(mdf1, mdf2, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'], how='inner')
+    #mdfj2 = pd.merge_ordered(mdfj1, mdf3, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'],  how='inner')
+    #df5 = pd.merge_ordered(mdfj2, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'], how='inner')
+    df5 = pd.concat([mdf1,mdf2,mdf3,mdf4],axis=1)
     df5.to_csv(txt_out5, sep="\t", index=False)
     return
 
