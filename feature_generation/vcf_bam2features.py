@@ -156,6 +156,8 @@ def validate_inputs(args):
 def generate_features(args):
     vcf_reader = vcf.Reader(open(args.inputVcf, 'r'))
     txt_out = os.path.join(args.outdir,args.outFile)
+    bamFile = args.bamFile
+    refFile = args.refFile
     #count = 0
     #vc_count= 0
     #txt_fh = open(txt_out, "wb")
@@ -163,7 +165,7 @@ def generate_features(args):
     rec_dict_list = []
     #iterate over statistics, one record at a time
     pool = mp.Pool(processes=args.processors)
-    results = [pool.apply_async(run_pysamstats, args=(args.bamFile,args.refFile,record)) for record in vcf_reader]
+    results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     rec_dict_list = [p.get() for p in results]
     #vc_count = vc_count + 1
     #Write output
