@@ -156,7 +156,6 @@ def validate_inputs(args):
 def generate_features(inputVcf,bamFile,refFile,outdir,outFile,processors):
     vcf_reader = vcf.Reader(open(inputVcf, 'r'))
     txt_out = os.path.join(outdir,outFile)
-    output = mp.Queue()
     #count = 0
     #vc_count= 0
     #txt_fh = open(txt_out, "wb")
