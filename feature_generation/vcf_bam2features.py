@@ -163,7 +163,7 @@ def generate_features(args):
             rec.prepend('Reference_Allele',ref)
             rec.prepend('Start_Position',position)
             rec.prepend('Tumor_Sample_Barcode',args.sampleName)
-            print rec
+            #print rec
             keys=rec.keys()
             rec_dict_list.append(rec)
             #print  args.sampleName, chromosome, ref, alt, rec['chrom'], rec['pos'], rec['reads_all'], rec['reads_pp'], rec['reads_mate_unmapped'],"\n"
