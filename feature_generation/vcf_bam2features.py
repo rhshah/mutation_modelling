@@ -164,6 +164,8 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     rec_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     print "typeof",type(rec_dict_list),"\n"
+    print "rec1",rec_dict_list[0],"\n"
+    print "rec1",rec_dict_list[30000],"\n"
     logger.info("Total Record in dict:%s", len(rec_dict_list))
     with open(txt_out, 'wb') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
