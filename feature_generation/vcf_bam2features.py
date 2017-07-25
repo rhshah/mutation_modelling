@@ -225,7 +225,7 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,record):
         rec['Tumor_Sample_Barcode']=sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
-        df = pd.DataFrame.from_dict(rec)
+        df = pd.DataFrame(rec)
         return(df)
 def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
@@ -246,7 +246,7 @@ def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
         rec['Tumor_Sample_Barcode']=sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
-        df = pd.DataFrame.from_dict(rec)
+        df = pd.DataFrame(rec)
         return(df)
 def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
@@ -267,7 +267,7 @@ def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
         rec['Tumor_Sample_Barcode']=sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
-        df = pd.DataFrame.from_dict(rec)
+        df = pd.DataFrame(rec)
         return(df)
 
 # Run the whole script
