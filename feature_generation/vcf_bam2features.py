@@ -33,6 +33,7 @@ import glob
 import textwrap
 import csv
 import collections
+import multiprocessing as mp
 
 logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -73,8 +74,10 @@ def main():
     parser.add_argument("-r", "--ref-file", action="store", dest="refFile", type=str, required=True, metavar='refFile', help="Full Path to the reference genome file to be used for feature generation")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", help="make lots of noise")
     parser.add_argument("-d", "--output-dir", action="store", dest="outdir", type=str, required=False, metavar='/somepath/output', help="Full Path to the output directory.")
-    parser.add_argument("-s", "--sample-name", action="store", dest="sampleName", type=str, required=False, metavar='SomeID', help="Sample ID for the bam file, if not provided the prefix of the bam file will be used")
-    parser.add_argument("-i", "--input-vcf", action="store", dest="inputVcf", type=str, required=False,metavar='/somepath/variants.vcf', help="Full Path to variant vcf")
+    parser.add_argument("-s", "--sample-name", action="store", dest="sampleName", type=str, required=True, metavar='SomeID', help="Sample ID for the bam file, if not provided the prefix of the bam file will be used")
+    parser.add_argument("-i", "--input-vcf", action="store", dest="inputVcf", type=str, required=True,metavar='/somepath/variants.vcf', help="Full Path to variant vcf")
+    parser.add_argument("-p", "--processors", action="store", dest="processors", type=int, default=10, required=False, metavar='10', help="Total number of processors to use")
+    
     args = parser.parse_args()
 	   
     args = validate_inputs(args)
@@ -104,6 +107,14 @@ def validate_inputs(args):
         if(args.verbose):
             logger.critical("vcf_bam2features: %s is not a valid file please rerun using a valid bam file", args.bamFile)
         sys.exit(1)
+    if(os.path.isfile(args.refFile)):
+        if(args.verbose):
+            logger.info("vcf_bam2features: Using %s as the reference file to generate features", args.bamFile)
+        pass
+    else:
+        if(args.verbose):
+            logger.critical("vcf_bam2features: %s is not a valid file please rerun using a valid reference file", args.refFile)
+        sys.exit(1)
     if(args.outdir):
         if(os.path.isdir(args.outdir)):
             if(args.verbose):
@@ -124,7 +135,13 @@ def validate_inputs(args):
     else:
         logger.info("vcf_bam2features: %s is not a string please use a proper string as a name", args.outFile)
         sys.exit(1)
-    
+    if(type(args.processors) is int):
+        if(args.verbose):
+            logger.info("vcf_bam2features: %s is a int and will be used as number of processors", args.processors)
+        pass
+    else:
+        logger.info("vcf_bam2features: %s is not a int please use a proper integer values for processors", args.processors)
+        sys.exit(1)
     if(args.sampleName):
         if(type(args.sampleName) is str):
             if(args.verbose):
@@ -140,41 +157,39 @@ def generate_features(args):
     vcf_reader = vcf.Reader(open(args.inputVcf, 'r'))
     bam_to_process = pysam.AlignmentFile(args.bamFile)
     txt_out = os.path.join(args.outdir,args.outFile)
-    count = 0
-    vc_count= 0
+    #count = 0
+    #vc_count= 0
     #txt_fh = open(txt_out, "wb")
     #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
     rec_dict_list = []
-    keys = []
-    keyorder = ['chrom','pos','ref','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
-# iterate over statistics, one record at a time
-    for record in vcf_reader:
-        chromosome = record.CHROM
-        position = int(record.POS)
-        ref = record.REF
-        alt = record.ALT[0]
-        for rec in pysamstats.stat_variation_strand(bam_to_process, args.refFile, chrom=chromosome, start=position-1, end=position,truncate=True):
-            rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
-            rec = MyOrderedDict(rec)
-            #rec.prepend('Tumor_Seq_Allele1',alt)
-            #rec.prepend('Reference_Allele',ref)
-            rec['pos']=position
-            rec.prepend('Tumor_Sample_Barcode',args.sampleName)
-            #print rec
-            if(count == 0):
-                keys=rec.keys()
-            #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
-            rec_dict_list.append(rec)
-            count = count + 1
-        vc_count = vc_count + 1
+    #iterate over statistics, one record at a time
+    pool = mp.Pool(processes=processors)
+    results = [pool.apply_async(run_pysamstats, args=(bam_to_process,args.refFile,record.CHROM,record.POS)) for record in vcf_reader]
+    rec_dict_list = [p.get() for p in results]
+    #vc_count = vc_count + 1
     #Write output
-    print "Total Count in VCF:",vc_count,"\n","Total Count in pysam:",count,"\n","Total Record in dict:", len(rec_dict_list)
+    #print "Total Count in VCF:",vc_count,"\n","Total Count in pysam:",count,"\n","Total Record in dict:", len(rec_dict_list)
     with open(txt_out, 'wb') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
         dict_writer.writeheader()
         dict_writer.writerows(rec_dict_list)
     return
-    
+def run_pysamstas(bam_to_process,reffile,chromosome,position):
+    keys = []
+    keyorder = ['chrom','pos','ref','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
+    for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=position-1, end=position,truncate=True):
+        rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
+        rec = MyOrderedDict(rec)
+        #rec.prepend('Tumor_Seq_Allele1',alt)
+        #rec.prepend('Reference_Allele',ref)
+        rec['pos']=position
+        rec.prepend('Tumor_Sample_Barcode',args.sampleName)
+        #print rec
+        if(count == 0):
+            keys=rec.keys()
+        #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
+        rec_dict_list.append(rec)
+        count = count + 1
 class MyOrderedDict(collections.OrderedDict):
     def prepend(self, key, value, dict_setitem=dict.__setitem__):
         root = self._OrderedDict__root
