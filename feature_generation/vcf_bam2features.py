@@ -33,7 +33,7 @@ import glob
 import textwrap
 import csv
 import collections
-import pprint
+
 
 logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -176,13 +176,13 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     #iterate over statistics, one record at a time
     rec_variation_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
-    print "typeof",type(rec_variation_dict_list),"\n"
-    print "typeofinside",type(rec_variation_df_list[0]),"\n"
-    pp.pprint(rec_variation_dict_list[0:10])
-    logger.info("Total Record in list of dict:%s", len(rec_variation_dict_list))
+    #print "typeof",type(rec_variation_dict_list),"\n"
+    #print "typeofinside",type(rec_variation_df_list[0]),"\n"
+    #pp.pprint(rec_variation_dict_list[0:10])
+    logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
     rec_variation_df_list = [x for x in rec_variation_dict_list if x is not None]
-    logger.info("Total Record in list of dict:%s", len(rec_variation_dict_list))
-    df1 = pd.DataFrame.from_dict(rec_variation_df_list)
+    logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
+    df1 = pd.DataFrame.from_dict(rec_variation_dict_list)
     df1.to_csv(txt_out1,sep="\t",ignore_index=True)
     
     #rec_baseq_df_list = []
@@ -190,9 +190,9 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     rec_baseq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     #print "typeof",type(rec_baseq_df_list),"\n"
-    logger.info("Total Record in list of dict:%s", len(rec_baseq_dict_list))
+    logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     rec_variation_dict_list = [x for x in rec_baseq_dict_list if x is not None]
-    logger.info("Total Record in list of dict:%s", len(rec_baseq_dict_list))
+    logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     df2 = pd.DataFarame.from_dict(rec_baseq_dict_list)
     df2.to_csv(txt_out2,sep="\t",ignore_index=True)
     
@@ -201,9 +201,9 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     rec_mapq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     #print "typeof",type(rec_mapq_df_list),"\n"
-    logger.info("Total Record in list of dict:%s", len(rec_mapq_dict_list))
+    logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
     rec_variation_dict_list = [x for x in rec_mapq_dict_list if x is not None]
-    logger.info("Total Record in list of df:%s", len(rec_mapq_dict_list))
+    logger.info("Total Record in list of mapq df:%s", len(rec_mapq_dict_list))
     df3 = pd.DataFrame(rec_mapq_df_list)
     df3.to_csv(txt_out3,sep="\t",ignore_index=True)
     #with open(txt_out, 'wb') as output_file:
