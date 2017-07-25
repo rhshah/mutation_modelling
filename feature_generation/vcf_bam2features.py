@@ -164,10 +164,6 @@ def validate_inputs(args):
 
 #Generate Features
 def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,processors):
-
-    keyorder_a = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
-    keyorder_b = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','rms_baseq','rms_baseq_fwd','rms_baseq_rev','rms_baseq_pp','rms_baseq_pp_fwd','rms_baseq_pp_rev','rms_baseq_matches','rms_baseq_matches_fwd','rms_baseq_matches_rev','rms_baseq_matches_pp','rms_baseq_matches_pp_fwd','rms_baseq_matches_pp_rev','rms_baseq_mismatches','rms_baseq_mismatches_fwd','rms_baseq_mismatches_rev','rms_baseq_mismatches_pp','rms_baseq_mismatches_pp_fwd','rms_baseq_mismatches_pp_rev']
-    keyorder_c = ['Tumor_Sample_Barcode','chrom','pos','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
     vcf_reader_a = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_b = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_c = vcf.Reader(open(inputVcf, 'r'))
@@ -258,7 +254,7 @@ def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
         return(rec)
 def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
-    keyorder = ['Tumor_Sample_Barcode','chrom','pos','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
+    keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
     chromosome = record.CHROM
     position = record.POS
     ref = record.REF
@@ -270,6 +266,7 @@ def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
         start = position - 1
         end = position 
     for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end,one_based=True,truncate=True):
+        rec['ref'] = ref
         rec['alt'] = alt
         rec['pos'] = position
         rec['Tumor_Sample_Barcode'] = sampleName
