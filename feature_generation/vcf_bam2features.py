@@ -85,12 +85,14 @@ def main():
     parser.add_argument("-s", "--sample-name", action="store", dest="sampleName", type=str, required=True, metavar='SomeID', help="Sample ID for the bam file, if not provided the prefix of the bam file will be used")
     parser.add_argument("-i", "--input-vcf", action="store", dest="inputVcf", type=str, required=True,metavar='/somepath/variants.vcf', help="Full Path to variant vcf")
     parser.add_argument("-p", "--processors", action="store", dest="processors", type=int, default=10, required=False, metavar='10', help="Total number of processors to use")
+    parser.add_argument("-mapq", "--min-mapq", action="store", dest="mapq", type=int, default=20, required=False, metavar='20', help="Minimum Mapping Quality")
+    parser.add_argument("-baseq", "--min-baseq", action="store", dest="baseq", type=int, default=20, required=False, metavar='20', help="Minimum Base Quality")
     
     args = parser.parse_args()
 	   
     args = validate_inputs(args)
     
-    generate_features(args.inputVcf,args.sampleName,args.bamFile,args.refFile,args.outdir,args.outFile,args.processors)
+    generate_features(args.inputVcf,args.sampleName,args.bamFile,args.refFile,args.outdir,args.outFile,args.baseq,args.mapq,args.processors)
     if(args.verbose):
         logger.info("vcf_bam2features: Finished generating flanking sequence")
         #logger.info("vcf_bam2features: Flanking sequence is written in %s", outfile)
@@ -150,6 +152,20 @@ def validate_inputs(args):
     else:
         logger.info("vcf_bam2features: %s is not a int please use a proper integer values for processors", args.processors)
         sys.exit(1)
+    if(type(args.mapq) is int):
+        if(args.verbose):
+            logger.info("vcf_bam2features: %s is a int and will be used as minimum mapping quality", args.mapq)
+        pass
+    else:
+        logger.info("vcf_bam2features: %s is not a int please use a proper integer values for mapping quality", args.mapq)
+        sys.exit(1)
+    if(type(args.baseq) is int):
+        if(args.verbose):
+            logger.info("vcf_bam2features: %s is a int and will be used as minimum base quality", args.baseq)
+        pass
+    else:
+        logger.info("vcf_bam2features: %s is not a int please use a proper integer values for base quality", args.baseq)
+        sys.exit(1)
     if(args.sampleName):
         if(type(args.sampleName) is str):
             if(args.verbose):
@@ -163,7 +179,7 @@ def validate_inputs(args):
     return(args)
 
 #Generate Features
-def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,processors):
+def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,baseq,mapq,processors):
     vcf_reader_a = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_b = vcf.Reader(open(inputVcf, 'r'))
     vcf_reader_c = vcf.Reader(open(inputVcf, 'r'))
@@ -172,7 +188,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     txt_out3 = os.path.join(outdir,outFile + "_mapq_stats.txt")
     #rec_variation_df_list = []
     #iterate over statistics, one record at a time
-    rec_variation_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
+    rec_variation_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,baseq,mapq,record)
                            for record in vcf_reader_a)
     #print "typeof",type(rec_variation_dict_list),"\n"
     #print "typeofinside",type(rec_variation_df_list[0]),"\n"
@@ -186,7 +202,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     
     #rec_baseq_df_list = []
     #iterate over statistics, one record at a time
-    rec_baseq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
+    rec_baseq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,baseq,mapq,sampleName,record)
                            for record in vcf_reader_b)
     #print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
@@ -197,7 +213,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     
     #rec_mapq_df_list = []
     #iterate over statistics, one record at a time
-    rec_mapq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
+    rec_mapq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,baseq,mapq,sampleName,record)
                            for record in vcf_reader_c)
     #print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
@@ -212,7 +228,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     return
 
 #Run PySamStats
-def run_pysamstats_variation(bamFile,refFile,sampleName,record):
+def run_pysamstats_variation(bamFile,refFile,sampleName,baseq,mapq,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
     keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']  
     chromosome = record.CHROM
@@ -225,14 +241,14 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,record):
     else:
         start = position
         end = position + 1
-    for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, one_based=True, truncate=True):
+    for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
         rec['alt'] = alt
         rec['pos'] = position
         rec['Tumor_Sample_Barcode'] = sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
-def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
+def run_pysamstats_baseq(bamFile,refFile,baseq,mapq,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
     keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','rms_baseq','rms_baseq_fwd','rms_baseq_rev','rms_baseq_pp','rms_baseq_pp_fwd','rms_baseq_pp_rev','rms_baseq_matches','rms_baseq_matches_fwd','rms_baseq_matches_rev','rms_baseq_matches_pp','rms_baseq_matches_pp_fwd','rms_baseq_matches_pp_rev','rms_baseq_mismatches','rms_baseq_mismatches_fwd','rms_baseq_mismatches_rev','rms_baseq_mismatches_pp','rms_baseq_mismatches_pp_fwd','rms_baseq_mismatches_pp_rev']
     chromosome = record.CHROM
@@ -245,14 +261,14 @@ def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
     else:
         start = position
         end = position + 1
-    for rec in pysamstats.stat_baseq_ext(bam_to_process, refFile, chrom=chromosome, start=start, end=end,one_based=True,truncate=True):
+    for rec in pysamstats.stat_baseq_ext(bam_to_process, refFile, chrom=chromosome, start=start, end=end, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
         rec['alt'] = alt
         rec['pos'] = position
         rec['Tumor_Sample_Barcode'] = sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
-def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
+def run_pysamstats_mapq(bamFile,refFile,baseq,mapq,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
     keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
     chromosome = record.CHROM
@@ -265,7 +281,7 @@ def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
     else:
         start = position
         end = position + 1
-    for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end,one_based=True,truncate=True):
+    for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
         rec['ref'] = ref
         rec['alt'] = alt
         rec['pos'] = position
