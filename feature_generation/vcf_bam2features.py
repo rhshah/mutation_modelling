@@ -194,7 +194,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     rec_baseq_dict_list = [x for x in rec_baseq_dict_list if x is not None]
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
-    df2 = pd.DataFarame.from_dict(rec_baseq_dict_list)
+    df2 = pd.DataFrame.from_dict(rec_baseq_dict_list)
     df2.to_csv(txt_out2,sep="\t",index=False)
     
     #rec_mapq_df_list = []
@@ -205,7 +205,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
     rec_mapq_dict_list = [x for x in rec_mapq_dict_list if x is not None]
     logger.info("Total Record in list of mapq df:%s", len(rec_mapq_dict_list))
-    df3 = pd.DataFrame(rec_mapq_df_list)
+    df3 = pd.DataFrame(rec_mapq_dict_list)
     df3.to_csv(txt_out3,sep="\t",index=False)
     #with open(txt_out, 'wb') as output_file:
     #    dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
