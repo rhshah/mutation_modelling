@@ -170,7 +170,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     txt_out1 = os.path.join(outdir,outFile,"_variation.txt")
     txt_out2 = os.path.join(outdir,outFile,"_baseq.txt")
     txt_out3 = os.path.join(outdir,outFile,"_mapq.txt")
-    rec_variation_df_list = []
+    #rec_variation_df_list = []
     #iterate over statistics, one record at a time
     rec_variation_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
@@ -179,7 +179,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     df1 = pd.DataFrame.from_dict(rec_variation_df_list)
     df1.to_csv(txt_out1,sep="\t",ignore_index=True)
     
-    rec_baseq_df_list = []
+    #rec_baseq_df_list = []
     #iterate over statistics, one record at a time
     rec_baseq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
@@ -188,7 +188,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     df2 = pd.DataFarame.from_dict(rec_baseq_df_list)
     df2.to_csv(txt_out2,sep="\t",ignore_index=True)
     
-    rec_mapq_df_list = []
+    #rec_mapq_df_list = []
     #iterate over statistics, one record at a time
     rec_mapq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
