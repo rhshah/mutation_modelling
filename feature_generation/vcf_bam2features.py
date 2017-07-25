@@ -33,7 +33,7 @@ import glob
 import textwrap
 import csv
 import collections
-import multiprocessing as mp
+from joblib import Parallel, delayed
 
 logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -163,8 +163,12 @@ def generate_features(inputVcf,bamFile,refFile,outdir,outFile,processors):
     #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
     rec_dict_list = []
     #iterate over statistics, one record at a time
-    pool = mp.Pool(processes=processors)
-    rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
+    
+    rec_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats)(bamFile,refFile,record)
+                           for record in vcf_reader)
+
+    #pool = mp.Pool(processes=processors)
+    #rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     #results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     #rec_dict_list = [p.get() for p in results]
     #vc_count = vc_count + 1
