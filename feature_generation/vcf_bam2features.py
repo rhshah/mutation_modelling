@@ -211,7 +211,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     rec_variation_dict_list = [x for x in rec_variation_dict_list if x is not None]
     logger.info("Total Records in list of variation dict:%s", len(rec_variation_dict_list))
     df1 = pd.DataFrame.from_dict(rec_variation_dict_list)
-    mdf1 = pd.DataFrame.copy(df1)
+    mdf1 = copy.deepcopy(df1)
     df1.to_csv(txt_out1, sep="\t", index=False)
     # BASEQ
     # iterate over statistics, one record at a time
@@ -222,7 +222,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     rec_baseq_dict_list = [x for x in rec_baseq_dict_list if x is not None]
     logger.info("Total Records in list of baseq dict:%s", len(rec_baseq_dict_list))
     df2 = pd.DataFrame.from_dict(rec_baseq_dict_list)
-    mdf2 = pd.DataFrame.copy(df2)
+    mdf2 = copy.deepcopy(df2)
     df2.to_csv(txt_out2, sep="\t", index=False)
     # MAPQ
     # iterate over statistics, one record at a time
@@ -233,7 +233,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     rec_mapq_dict_list = [x for x in rec_mapq_dict_list if x is not None]
     logger.info("Total Records in list of mapq dict:%s", len(rec_mapq_dict_list))
     df3 = pd.DataFrame(rec_mapq_dict_list)
-    mdf3 = pd.DataFrame.copy(df3)
+    mdf3 = copy.deepcopy(df3)
     df3.to_csv(txt_out3, sep="\t", index=False)
     # GC
     # iterate over statistics, one record at a time
@@ -244,13 +244,14 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     rec_gc_dict_list = [x for x in rec_gc_dict_list if x is not None]
     logger.info("Total Records in list of gc dict:%s", len(rec_gc_dict_list))
     df4 = pd.DataFrame(rec_gc_dict_list)
-    mdf4 = pd.DataFrame.copy(df4)
+    mdf4 = copy.deepcopy(df4)
     df4.to_csv(txt_out4, sep="\t", index=False)
     # MERGE
     #dfj1 = mdf1.join(mdf2,rsuffix='_baseq').join(mdf3,rsuffix='_mapq').join(mdf4,rsuffix='_gc')
-    mdfj1 = pd.merge(mdf1, mdf2, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
-    mdfj2 = pd.merge(mdfj1, mdf3, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
-    df5 = pd.merge(mdfj2, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
+    #mdfj1 = pd.merge(mdf1, mdf2, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
+    #mdfj2 = pd.merge(mdfj1, mdf3, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
+    #df5 = pd.merge(mdfj2, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
+    df5 = pd.concat(mdf1,mdf2,mdf3,mdf4,axis=1)
     df5.to_csv(txt_out5, sep="\t", index=False)
     return
 
