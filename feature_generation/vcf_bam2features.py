@@ -226,7 +226,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     df3.to_csv(txt_out3, sep="\t", index=False)
     # GC
     # iterate over statistics, one record at a time
-    rec_gc_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_gc)(bamFile, refFile, baseq, gc, sampleName, record)
+    rec_gc_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_gc)(bamFile, refFile, baseq, mapq, sampleName, record)
                            for record in vcf_reader_d)
     # print "typeof",type(rec_gc_df_list),"\n"
     # logger.info("Total Record in list of gc dict:%s", len(rec_gc_dict_list))
@@ -236,7 +236,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     mdf4 = pd.DataFrame.copy(df4)
     df4.to_csv(txt_out4, sep="\t", index=False)
     # MERGE
-    df5 = pd.merge(mdf1, mdf2, mdf3, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt'])
+    df5 = pd.merge(mdf1, mdf2, mdf3, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
     df5.to_csv(txt_out5, sep="\t", index=False)
     return
 
@@ -295,7 +295,6 @@ def run_pysamstats_gc(bamFile, refFile, baseq, mapq, sampleName, record):
     ref = record.REF
     alt = record.ALT[0]
     for rec in pysamstats.stat_coverage_gc(bam_to_process, refFile, chrom=chromosome, start=position, end=None, min_mapq=mapq, min_baseq=baseq, no_del=False, no_dup=True, window_size=50, window_offset=10, one_based=True, truncate=True):
-        print rec, "\n"
         rec['ref'] = ref
         rec['alt'] = alt
         rec['pos'] = position
