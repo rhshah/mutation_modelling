@@ -263,7 +263,7 @@ def run_pysamstats_mapq(bamFile,refFile,baseq,mapq,sampleName,record):
     position = record.POS
     ref = record.REF
     alt = record.ALT[0]
-    for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=position, end=None, min_mapq=mapq, min_baseq=baseqm no_del=False, no_dup=False, one_based=True, truncate=True):
+    for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=position, end=None, min_mapq=mapq, min_baseq=baseq, no_del=False, no_dup=False, one_based=True, truncate=True):
         rec['ref'] = ref
         rec['alt'] = alt
         rec['pos'] = position
