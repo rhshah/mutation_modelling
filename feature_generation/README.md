@@ -40,3 +40,13 @@ optional arguments:
   -baseq 20, --min-baseq 20
                         Minimum Base Quality
 ```
+
+#### Output
+It will produce 5 files.
+1. prefix_variant-stats.txt
+2. prefix_baseq-stats.txt
+3. prefix_mapq-stats.txt
+4. prefix_gc-stats.txt
+5. prefix_merged-stats.txt which is essentially combination of all
+
+Note: For details of each column please refer the [pysamstats](https://github.com/alimanfoo/pysamstats) documentation.

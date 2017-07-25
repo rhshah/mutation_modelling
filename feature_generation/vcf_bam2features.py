@@ -236,7 +236,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     mdf4 = pd.DataFrame.copy(df4)
     df4.to_csv(txt_out4, sep="\t", index=False)
     # MERGE
-    df5 = pd.merge(mdf1, mdf2, mdf3, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'])
+    df5 = pd.merge(mdf1, mdf2, mdf3, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt'])
     df5.to_csv(txt_out5, sep="\t", index=False)
     return
 
