@@ -181,7 +181,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     #pp = pprint.PrettyPrinter(indent=4)
     #pp.pprint(rec_variation_dict_list[0:10])
     logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
-    rec_variation_df_list = [x for x in rec_variation_dict_list if x is not None]
+    rec_variation_dict_list = [x for x in rec_variation_dict_list if x is not None]
     logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
     df1 = pd.DataFrame.from_dict(rec_variation_dict_list)
     df1.to_csv(txt_out1,sep="\t",ignore_index=True)
@@ -192,7 +192,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
                            for record in vcf_reader)
     #print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
-    rec_variation_dict_list = [x for x in rec_baseq_dict_list if x is not None]
+    rec_baseq_dict_list = [x for x in rec_baseq_dict_list if x is not None]
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     df2 = pd.DataFarame.from_dict(rec_baseq_dict_list)
     df2.to_csv(txt_out2,sep="\t",ignore_index=True)
@@ -203,7 +203,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
                            for record in vcf_reader)
     #print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
-    rec_variation_dict_list = [x for x in rec_mapq_dict_list if x is not None]
+    rec_mapq_dict_list = [x for x in rec_mapq_dict_list if x is not None]
     logger.info("Total Record in list of mapq df:%s", len(rec_mapq_dict_list))
     df3 = pd.DataFrame(rec_mapq_df_list)
     df3.to_csv(txt_out3,sep="\t",ignore_index=True)
