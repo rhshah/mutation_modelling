@@ -174,9 +174,10 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     txt_out3 = os.path.join(outdir,outFile,"_mapq.txt")
     #rec_variation_df_list = []
     #iterate over statistics, one record at a time
-    rec_variation_df_list = Parallel(n_jobs=processors, backend="threading")(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
+    rec_variation_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
-    #print "typeof",type(rec_variation_df_list),"\n"
+    print "typeof",type(rec_variation_df_list),"\n"
+    print "typeofinside",type(rec_variation_df_list[0]),"\n"
     pp.pprint(rec_variation_df_list[0:10])
     logger.info("Total Record in list of df:%s", len(rec_variation_df_list))
     df1 = pd.DataFrame.from_dict(rec_variation_df_list)
@@ -184,7 +185,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     
     #rec_baseq_df_list = []
     #iterate over statistics, one record at a time
-    rec_baseq_df_list = Parallel(n_jobs=processors, backend="threading")(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
+    rec_baseq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     #print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_baseq_df_list))
@@ -193,7 +194,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     
     #rec_mapq_df_list = []
     #iterate over statistics, one record at a time
-    rec_mapq_df_list = Parallel(n_jobs=processors, backend="threading")(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
+    rec_mapq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     #print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_mapq_df_list))
