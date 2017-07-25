@@ -164,7 +164,7 @@ def generate_features(inputVcf,bamFile,refFile,outdir,outFile,processors):
     rec_dict_list = []
     #iterate over statistics, one record at a time
     pool = mp.Pool(processes=processors)
-    rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
+    rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record,)) for record in vcf_reader]
     #results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     #rec_dict_list = [p.get() for p in results]
     #vc_count = vc_count + 1
@@ -196,6 +196,8 @@ def run_pysamstats(bamFile,refFile,record):
         rec_dict_list.append(rec)
         count = count + 1
     return(rec_dict_list)
+
+#Make Special Prepend function
 class MyOrderedDict(collections.OrderedDict):
     def prepend(self, key, value, dict_setitem=dict.__setitem__):
         root = self._OrderedDict__root
