@@ -166,7 +166,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     
     rec_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
-    print rec_dict_list
+    logger.info("Total Record in dict:%s", len(rec_dict_list))
     #pool = mp.Pool(processes=processors)
     #rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     #results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
