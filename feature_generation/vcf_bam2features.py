@@ -253,6 +253,7 @@ def generate_features(inputVcf, sampleName, bamFile, refFile, outdir, outFile, b
     #mdfj2 = pd.merge_ordered(mdfj1, mdf3, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'],  how='inner')
     #df5 = pd.merge_ordered(mdfj2, mdf4, on=['Tumor_Sample_Barcode', 'chrom', 'pos', 'ref', 'alt', 'reads_all', 'reads_pp'], how='inner')
     df5 = pd.concat([mdf1,mdf2,mdf3,mdf4],axis=1)
+    df5 = df5.loc[:,~df5.columns.duplicated()]
     df5.to_csv(txt_out5, sep="\t", index=False)
     return
 
