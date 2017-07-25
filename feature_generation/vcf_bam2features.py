@@ -168,14 +168,16 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     keyorder_a = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
     keyorder_b = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','rms_baseq','rms_baseq_fwd','rms_baseq_rev','rms_baseq_pp','rms_baseq_pp_fwd','rms_baseq_pp_rev','rms_baseq_matches','rms_baseq_matches_fwd','rms_baseq_matches_rev','rms_baseq_matches_pp','rms_baseq_matches_pp_fwd','rms_baseq_matches_pp_rev','rms_baseq_mismatches','rms_baseq_mismatches_fwd','rms_baseq_mismatches_rev','rms_baseq_mismatches_pp','rms_baseq_mismatches_pp_fwd','rms_baseq_mismatches_pp_rev']
     keyorder_c = ['Tumor_Sample_Barcode','chrom','pos','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
-    vcf_reader = vcf.Reader(open(inputVcf, 'r'))
+    vcf_reader_a = vcf.Reader(open(inputVcf, 'r'))
+    vcf_reader_b = vcf.Reader(open(inputVcf, 'r'))
+    vcf_reader_c = vcf.Reader(open(inputVcf, 'r'))
     txt_out1 = os.path.join(outdir,outFile + "_variation.txt")
     txt_out2 = os.path.join(outdir,outFile + "_baseq.txt")
     txt_out3 = os.path.join(outdir,outFile + "_mapq.txt")
     #rec_variation_df_list = []
     #iterate over statistics, one record at a time
     rec_variation_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
-                           for record in vcf_reader)
+                           for record in vcf_reader_a)
     #print "typeof",type(rec_variation_dict_list),"\n"
     #print "typeofinside",type(rec_variation_df_list[0]),"\n"
     #pp = pprint.PrettyPrinter(indent=4)
@@ -189,7 +191,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     #rec_baseq_df_list = []
     #iterate over statistics, one record at a time
     rec_baseq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
-                           for record in vcf_reader)
+                           for record in vcf_reader_b)
     #print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     rec_baseq_dict_list = [x for x in rec_baseq_dict_list if x is not None]
@@ -200,7 +202,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     #rec_mapq_df_list = []
     #iterate over statistics, one record at a time
     rec_mapq_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
-                           for record in vcf_reader)
+                           for record in vcf_reader_c)
     #print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of mapq dict:%s", len(rec_mapq_dict_list))
     rec_mapq_dict_list = [x for x in rec_mapq_dict_list if x is not None]
