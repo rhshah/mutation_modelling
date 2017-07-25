@@ -169,9 +169,9 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     keyorder_b = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','rms_baseq','rms_baseq_fwd','rms_baseq_rev','rms_baseq_pp','rms_baseq_pp_fwd','rms_baseq_pp_rev','rms_baseq_matches','rms_baseq_matches_fwd','rms_baseq_matches_rev','rms_baseq_matches_pp','rms_baseq_matches_pp_fwd','rms_baseq_matches_pp_rev','rms_baseq_mismatches','rms_baseq_mismatches_fwd','rms_baseq_mismatches_rev','rms_baseq_mismatches_pp','rms_baseq_mismatches_pp_fwd','rms_baseq_mismatches_pp_rev']
     keyorder_c = ['Tumor_Sample_Barcode','chrom','pos','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
     vcf_reader = vcf.Reader(open(inputVcf, 'r'))
-    txt_out1 = os.path.join(outdir,outFile,"_variation.txt")
-    txt_out2 = os.path.join(outdir,outFile,"_baseq.txt")
-    txt_out3 = os.path.join(outdir,outFile,"_mapq.txt")
+    txt_out1 = os.path.join(outdir,outFile + "_variation.txt")
+    txt_out2 = os.path.join(outdir,outFile + "_baseq.txt")
+    txt_out3 = os.path.join(outdir,outFile + "_mapq.txt")
     #rec_variation_df_list = []
     #iterate over statistics, one record at a time
     rec_variation_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
