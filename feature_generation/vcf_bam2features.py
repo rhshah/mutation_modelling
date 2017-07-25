@@ -176,9 +176,8 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
                            for record in vcf_reader)
     print "typeof",type(rec_variation_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_variation_df_list))
-    df1 = pd.concat(rec_variation_df_list,axis=1,ignore_index=True)
-    df1 = df1.resent_index(drop=True)
-    df1.to_csv(txt_out,sep="\t")
+    df1 = pd.DataFrame(rec_variation_df_list)
+    df1.to_csv(txt_out,sep="\t",ignore_index=True)
     
     rec_baseq_df_list = []
     #iterate over statistics, one record at a time
@@ -186,9 +185,8 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
                            for record in vcf_reader)
     print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_baseq_df_list))
-    df2 = pd.concat(rec_variation_dict_list,axis=1,ignore_index=True)
-    df2 = df2.resent_index(drop=True)
-    df2.to_csv(txt_out,sep="\t")
+    df2 = pd.DataFarame(rec_variation_dict_list)
+    df2.to_csv(txt_out,sep="\t",ignore_index=True)
     
     rec_mapq_df_list = []
     #iterate over statistics, one record at a time
@@ -196,8 +194,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
                            for record in vcf_reader)
     print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_mapq_df_list))
-    df3 = pd.concat(rec_variation_dict_list,axis=1,ignore_index=True)
-    df3 = df3.resent_index(drop=True)
+    df3 = pd.DataFrame(rec_variation_dict_list)
     df3.to_csv(txt_out,sep="\t",ignore_index=True)
     #with open(txt_out, 'wb') as output_file:
     #    dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
@@ -225,8 +222,7 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,record):
         rec['Tumor_Sample_Barcode']=sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
-        df = pd.DataFrame(rec)
-        return(df)
+        return(rec)
 def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
     keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','rms_baseq','rms_baseq_fwd','rms_baseq_rev','rms_baseq_pp','rms_baseq_pp_fwd','rms_baseq_pp_rev','rms_baseq_matches','rms_baseq_matches_fwd','rms_baseq_matches_rev','rms_baseq_matches_pp','rms_baseq_matches_pp_fwd','rms_baseq_matches_pp_rev','rms_baseq_mismatches','rms_baseq_mismatches_fwd','rms_baseq_mismatches_rev','rms_baseq_mismatches_pp','rms_baseq_mismatches_pp_fwd','rms_baseq_mismatches_pp_rev']
@@ -246,8 +242,7 @@ def run_pysamstats_baseq(bamFile,refFile,sampleName,record):
         rec['Tumor_Sample_Barcode']=sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
-        df = pd.DataFrame(rec)
-        return(df)
+        return(rec)
 def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
     bam_to_process = pysam.AlignmentFile(bamFile)
     keyorder = ['Tumor_Sample_Barcode','chrom','pos','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
@@ -267,8 +262,7 @@ def run_pysamstats_mapq(bamFile,refFile,sampleName,record):
         rec['Tumor_Sample_Barcode']=sampleName
         rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
-        df = pd.DataFrame(rec)
-        return(df)
+        return(rec)
 
 # Run the whole script
 if __name__ == "__main__":
