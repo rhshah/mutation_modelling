@@ -241,7 +241,7 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,baseq,mapq,record):
     else:
         start = position
         end = position + 1
-    for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
+    for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=position, end=None, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
         rec['alt'] = alt
         rec['pos'] = position
         rec['Tumor_Sample_Barcode'] = sampleName
@@ -261,7 +261,7 @@ def run_pysamstats_baseq(bamFile,refFile,baseq,mapq,sampleName,record):
     else:
         start = position
         end = position + 1
-    for rec in pysamstats.stat_baseq_ext(bam_to_process, refFile, chrom=chromosome, start=start, end=end, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
+    for rec in pysamstats.stat_baseq_ext(bam_to_process, refFile, chrom=chromosome, start=position, end=None, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
         rec['alt'] = alt
         rec['pos'] = position
         rec['Tumor_Sample_Barcode'] = sampleName
@@ -281,7 +281,7 @@ def run_pysamstats_mapq(bamFile,refFile,baseq,mapq,sampleName,record):
     else:
         start = position
         end = position + 1
-    for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
+    for rec in pysamstats.stat_mapq_strand(bam_to_process, refFile, chrom=chromosome, start=position, end=None, min_mapq=mapq, min_baseq=baseq, one_based=True, truncate=True):
         rec['ref'] = ref
         rec['alt'] = alt
         rec['pos'] = position
