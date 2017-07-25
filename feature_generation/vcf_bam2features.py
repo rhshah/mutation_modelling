@@ -143,13 +143,13 @@ def generate_features(args):
     #txt_fh = open(txt_out, "wb")
     #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
     rec_dict_list = []
+    keys = []
 # iterate over statistics, one record at a time
     for record in vcf_reader:
         chromosome = record.CHROM
         position = int(record.POS)
         ref = record.REF
         alt = record.ALT[0]
-        keys = []
 #         if(len(str(ref)) > len(str(alt))):
 #             start = position
 #             end = position + 2
