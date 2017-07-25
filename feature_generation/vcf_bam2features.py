@@ -226,7 +226,7 @@ def run_pysamstats_variation(bamFile,refFile,sampleName,record):
         end = position + 1
     else:
         start = position - 1
-        end = position 
+        end = position
     for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end, one_based=True, truncate=True):
         rec['alt'] = alt
         rec['pos']=position
