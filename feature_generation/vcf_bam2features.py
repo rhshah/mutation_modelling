@@ -154,70 +154,40 @@ def validate_inputs(args):
     
     return(args)
 def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,processors):
-    keys = ['Tumor_Sample_Barcode','chrom','pos','ref','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
+    keys = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
     vcf_reader = vcf.Reader(open(inputVcf, 'r'))
     txt_out = os.path.join(outdir,outFile)
-    #count = 0
-    #vc_count= 0
-    #txt_fh = open(txt_out, "wb")
-    #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
-    #rec_dict_list = []
     #iterate over statistics, one record at a time
-    
     rec_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     logger.info("Total Record in dict:%s", len(rec_dict_list))
-    #pool = mp.Pool(processes=processors)
-    #rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
-    #results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
-    #rec_dict_list = [p.get() for p in results]
-    #vc_count = vc_count + 1
-    #Write output
-    #print "Total Count in VCF:",vc_count,"\n","Total Count in pysam:",count,"\n","Total Record in dict:", len(rec_dict_list)
     with open(txt_out, 'wb') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
         dict_writer.writeheader()
         dict_writer.writerows(rec_dict_list)
     return
+#Run PySamStas
 def run_pysamstats(bamFile,refFile,sampleName,record):
     rec_dict_list = []
     bam_to_process = pysam.AlignmentFile(bamFile)
-    keyorder = ['chrom','pos','ref','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
+    keyorder = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
     chromosome = record.CHROM
     position = record.POS
-    if(len(str(record.REF)) > len(str(record.ALT))):
+    ref = record.REF
+    alt = record.ALT[0]
+    if(len(str(ref)) > len(str(alt))):
         start = position
         end = position + 1
     else:
         start = position - 1
         end = position 
     for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=start, end=end,truncate=True):
-        rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
-        rec = MyOrderedDict(rec)
-        #rec.prepend('Tumor_Seq_Allele1',alt)
-        #rec.prepend('Reference_Allele',ref)
+        rec['alt'] = alt
         rec['pos']=position
-        rec.prepend('Tumor_Sample_Barcode',sampleName)
-        #print rec
+        rec['Tumor_Sample_Barcode']=sampleName
+        rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         return(rec)
-
-#Make Special Prepend function
-class MyOrderedDict(collections.OrderedDict):
-    def prepend(self, key, value, dict_setitem=dict.__setitem__):
-        root = self._OrderedDict__root
-        first = root[1]
-        if key in self:
-            link = self._OrderedDict__map[key]
-            link_prev, link_next, _ = link
-            link_prev[1] = link_next
-            link_next[0] = link_prev
-            link[0] = root
-            link[1] = first
-            root[1] = first[0] = link
-        else:
-            root[1] = first[0] = self._OrderedDict__map[key] = [root, first, key]
-            dict_setitem(self, key, value)
             
 # Run the whole script
 if __name__ == "__main__":
