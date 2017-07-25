@@ -33,6 +33,7 @@ import glob
 import textwrap
 import csv
 import collections
+import pprint
 
 logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -163,6 +164,7 @@ def validate_inputs(args):
 
 #Generate Features
 def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,processors):
+    pp = pprint.PrettyPrinter(indent=4)
     keyorder_a = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
     keyorder_b = ['Tumor_Sample_Barcode','chrom','pos','ref','alt','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','rms_baseq','rms_baseq_fwd','rms_baseq_rev','rms_baseq_pp','rms_baseq_pp_fwd','rms_baseq_pp_rev','rms_baseq_matches','rms_baseq_matches_fwd','rms_baseq_matches_rev','rms_baseq_matches_pp','rms_baseq_matches_pp_fwd','rms_baseq_matches_pp_rev','rms_baseq_mismatches','rms_baseq_mismatches_fwd','rms_baseq_mismatches_rev','rms_baseq_mismatches_pp','rms_baseq_mismatches_pp_fwd','rms_baseq_mismatches_pp_rev']
     keyorder_c = ['Tumor_Sample_Barcode','chrom','pos','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','reads_mapq0','reads_mapq0_fwd','reads_mapq0_rev','reads_mapq0_pp','reads_mapq0_pp_fwd','reads_mapq0_pp_rev','rms_mapq','rms_mapq_fwd','rms_mapq_rev','rms_mapq_pp','rms_mapq_pp_fwd','rms_mapq_pp_rev','max_mapq','max_mapq_fwd','max_mapq_rev','max_mapq_pp','max_mapq_pp_fwd','max_mapq_pp_rev']
@@ -172,16 +174,17 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     txt_out3 = os.path.join(outdir,outFile,"_mapq.txt")
     #rec_variation_df_list = []
     #iterate over statistics, one record at a time
-    rec_variation_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
+    rec_variation_df_list = Parallel(n_jobs=processors, backend="threading")(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     #print "typeof",type(rec_variation_df_list),"\n"
+    pp.pprint(rec_variation_df_list[0:10])
     logger.info("Total Record in list of df:%s", len(rec_variation_df_list))
     df1 = pd.DataFrame.from_dict(rec_variation_df_list)
     df1.to_csv(txt_out1,sep="\t",ignore_index=True)
     
     #rec_baseq_df_list = []
     #iterate over statistics, one record at a time
-    rec_baseq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
+    rec_baseq_df_list = Parallel(n_jobs=processors, backend="threading")(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     #print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_baseq_df_list))
@@ -190,7 +193,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     
     #rec_mapq_df_list = []
     #iterate over statistics, one record at a time
-    rec_mapq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
+    rec_mapq_df_list = Parallel(n_jobs=processors, backend="threading")(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
     #print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_mapq_df_list))
