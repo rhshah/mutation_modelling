@@ -161,12 +161,12 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     #vc_count= 0
     #txt_fh = open(txt_out, "wb")
     #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
-    rec_dict_list = []
+    #rec_dict_list = []
     #iterate over statistics, one record at a time
     
     rec_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
-
+    print rec_dict_list
     #pool = mp.Pool(processes=processors)
     #rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     #results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
