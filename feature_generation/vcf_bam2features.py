@@ -191,7 +191,7 @@ def generate_features(args):
     with open(txt_out, 'wb') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
         dict_writer.writeheader()
-        dict_writer.writerows(final)
+        dict_writer.writerows(rec_dict_list)
     return
     
 class MyOrderedDict(collections.OrderedDict):
