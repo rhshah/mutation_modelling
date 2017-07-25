@@ -157,6 +157,7 @@ def generate_features(args):
 #             start = position -1
 #             end = position + 1
         for rec in pysamstats.stat_variation_strand(bam_to_process, args.refFile, chrom=chromosome, start=position, end=position):
+            rec = collections.OrderedDict(rec)
             rec = MyOrderedDict(rec)
             rec.prepend('Tumor_Seq_Allele1',alt)
             rec.prepend('Reference_Allele',ref)
