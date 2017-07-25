@@ -137,10 +137,10 @@ def validate_inputs(args):
     
     if(type(args.outFile) is str):
         if(args.verbose):
-            logger.info("vcf_bam2features: %s is a string and will be used as the output file name", args.outFile)
+            logger.info("vcf_bam2features: %s is a string and will be used as the output file name prefix", args.outFile)
         pass
     else:
-        logger.info("vcf_bam2features: %s is not a string please use a proper string as a name", args.outFile)
+        logger.info("vcf_bam2features: %s is not a string please use a proper string as a name prefix", args.outFile)
         sys.exit(1)
     if(type(args.processors) is int):
         if(args.verbose):
@@ -174,28 +174,28 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     #iterate over statistics, one record at a time
     rec_variation_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_variation)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
-    print "typeof",type(rec_variation_df_list),"\n"
+    #print "typeof",type(rec_variation_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_variation_df_list))
-    df1 = pd.DataFrame(rec_variation_df_list)
-    df1.to_csv(txt_out,sep="\t",ignore_index=True)
+    df1 = pd.DataFrame.from_dict(rec_variation_df_list)
+    df1.to_csv(txt_out1,sep="\t",ignore_index=True)
     
     rec_baseq_df_list = []
     #iterate over statistics, one record at a time
     rec_baseq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_baseq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
-    print "typeof",type(rec_baseq_df_list),"\n"
+    #print "typeof",type(rec_baseq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_baseq_df_list))
-    df2 = pd.DataFarame(rec_variation_dict_list)
-    df2.to_csv(txt_out,sep="\t",ignore_index=True)
+    df2 = pd.DataFarame.from_dict(rec_baseq_df_list)
+    df2.to_csv(txt_out2,sep="\t",ignore_index=True)
     
     rec_mapq_df_list = []
     #iterate over statistics, one record at a time
     rec_mapq_df_list = Parallel(n_jobs=processors)(delayed(run_pysamstats_mapq)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
-    print "typeof",type(rec_mapq_df_list),"\n"
+    #print "typeof",type(rec_mapq_df_list),"\n"
     logger.info("Total Record in list of df:%s", len(rec_mapq_df_list))
-    df3 = pd.DataFrame(rec_variation_dict_list)
-    df3.to_csv(txt_out,sep="\t",ignore_index=True)
+    df3 = pd.DataFrame(rec_mapq_df_list)
+    df3.to_csv(txt_out3,sep="\t",ignore_index=True)
     #with open(txt_out, 'wb') as output_file:
     #    dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
     #    dict_writer.writeheader()
