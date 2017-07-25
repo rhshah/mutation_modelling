@@ -174,7 +174,7 @@ def generate_features(args):
         dict_writer.writeheader()
         dict_writer.writerows(rec_dict_list)
     return
-def run_pysamstas(bam_to_process,reffile,chromosome,position):
+def run_pysamstats(bam_to_process,reffile,chromosome,position):
     keys = []
     keyorder = ['chrom','pos','ref','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
     for rec in pysamstats.stat_variation_strand(bam_to_process, refFile, chrom=chromosome, start=position-1, end=position,truncate=True):
