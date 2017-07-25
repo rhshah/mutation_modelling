@@ -33,7 +33,7 @@ import glob
 import textwrap
 import csv
 import collections
-
+import pprint
 
 logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -192,8 +192,8 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,baseq,m
                            for record in vcf_reader_a)
     #print "typeof",type(rec_variation_dict_list),"\n"
     #print "typeofinside",type(rec_variation_df_list[0]),"\n"
-    #pp = pprint.PrettyPrinter(indent=4)
-    #pp.pprint(rec_variation_dict_list[0:10])
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(rec_variation_dict_list[0:30])
     logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
     rec_variation_dict_list = [x for x in rec_variation_dict_list if x is not None]
     logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
