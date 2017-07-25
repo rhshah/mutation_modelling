@@ -130,7 +130,7 @@ def validate_inputs(args):
         sys.exit(1)
     if(os.path.isfile(args.refFile)):
         if(args.verbose):
-            logger.info("vcf_bam2features: Using %s as the reference file to generate features", args.bamFile)
+            logger.info("vcf_bam2features: Using %s as the reference file to generate features", args.refFile)
         pass
     else:
         if(args.verbose):
