@@ -177,7 +177,7 @@ def generate_features(arg):
         dict_writer.writeheader()
         dict_writer.writerows(rec_dict_list)
     return
-def run_pysamstats(bamFile,reffile,record):
+def run_pysamstats(bamFile,refFile,record):
     keys = []
     rec_dict_list = []
     bam_to_process = pysam.AlignmentFile(bamFile)
