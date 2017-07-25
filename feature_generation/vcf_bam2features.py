@@ -82,7 +82,7 @@ def main():
 	   
     args = validate_inputs(args)
     
-    generate_features(args.inputVcf,args.bamFile,args.refFile,args.outdir,args.outFile,args.processors)
+    generate_features(args.inputVcf,args.sampleName,args.bamFile,args.refFile,args.outdir,args.outFile,args.processors)
     if(args.verbose):
         logger.info("vcf_bam2features: Finished generating flanking sequence")
         #logger.info("vcf_bam2features: Flanking sequence is written in %s", outfile)
@@ -153,7 +153,7 @@ def validate_inputs(args):
             logger.info("vcf_bam2features: %s is a string and will be used in output file", args.sampleName)
     
     return(args)
-def generate_features(inputVcf,bamFile,refFile,outdir,outFile,processors):
+def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,processors):
     vcf_reader = vcf.Reader(open(inputVcf, 'r'))
     txt_out = os.path.join(outdir,outFile)
     #count = 0
@@ -163,7 +163,7 @@ def generate_features(inputVcf,bamFile,refFile,outdir,outFile,processors):
     rec_dict_list = []
     #iterate over statistics, one record at a time
     
-    rec_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats)(bamFile,refFile,record)
+    rec_dict_list = Parallel(n_jobs=processors)(delayed(run_pysamstats)(bamFile,refFile,sampleName,record)
                            for record in vcf_reader)
 
     #pool = mp.Pool(processes=processors)
@@ -178,7 +178,7 @@ def generate_features(inputVcf,bamFile,refFile,outdir,outFile,processors):
         dict_writer.writeheader()
         dict_writer.writerows(rec_dict_list)
     return
-def run_pysamstats(bamFile,refFile,record):
+def run_pysamstats(bamFile,refFile,sampleName,record):
     keys = []
     rec_dict_list = []
     bam_to_process = pysam.AlignmentFile(bamFile)
@@ -191,7 +191,7 @@ def run_pysamstats(bamFile,refFile,record):
         #rec.prepend('Tumor_Seq_Allele1',alt)
         #rec.prepend('Reference_Allele',ref)
         rec['pos']=position
-        rec.prepend('Tumor_Sample_Barcode',args.sampleName)
+        rec.prepend('Tumor_Sample_Barcode',sampleName)
         #print rec
         if(count == 0):
             keys=rec.keys()
