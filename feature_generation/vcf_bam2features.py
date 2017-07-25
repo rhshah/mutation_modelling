@@ -157,7 +157,11 @@ def generate_features(args):
 #             start = position -1
 #             end = position + 1
         for rec in pysamstats.stat_variation_strand(bam_to_process, args.refFile, chrom=chromosome, start=position, end=position):
-            rec = collections.OrderedDict(rec)
+            rec = MyOrderedDict(rec)
+            rec.prepend('Tumor_Seq_Allele1',alt)
+            rec.prepend('Reference_Allele',ref)
+            rec.prepend('Start_Position',position)
+            rec.prepend('Tumor_Sample_Barcode',args.sampleName)
             keys=rec.keys()
             rec_dict_list.append(rec)
             #print  args.sampleName, chromosome, ref, alt, rec['chrom'], rec['pos'], rec['reads_all'], rec['reads_pp'], rec['reads_mate_unmapped'],"\n"
@@ -189,6 +193,23 @@ def generate_features(args):
         dict_writer.writeheader()
         dict_writer.writerows(final)
     return
+    
+class MyOrderedDict(collections.OrderedDict):
+    def prepend(self, key, value, dict_setitem=dict.__setitem__):
+        root = self._OrderedDict__root
+        first = root[1]
+        if key in self:
+            link = self._OrderedDict__map[key]
+            link_prev, link_next, _ = link
+            link_prev[1] = link_next
+            link_next[0] = link_prev
+            link[0] = root
+            link[1] = first
+            root[1] = first[0] = link
+        else:
+            root[1] = first[0] = self._OrderedDict__map[key] = [root, first, key]
+            dict_setitem(self, key, value)
+            
 # Run the whole script
 if __name__ == "__main__":
     start_time = time.time()
