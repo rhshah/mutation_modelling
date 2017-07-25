@@ -184,7 +184,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     rec_variation_dict_list = [x for x in rec_variation_dict_list if x is not None]
     logger.info("Total Record in list of variation dict:%s", len(rec_variation_dict_list))
     df1 = pd.DataFrame.from_dict(rec_variation_dict_list)
-    df1.to_csv(txt_out1,sep="\t",ignore_index=True)
+    df1.to_csv(txt_out1,sep="\t",index=False)
     
     #rec_baseq_df_list = []
     #iterate over statistics, one record at a time
@@ -195,7 +195,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     rec_baseq_dict_list = [x for x in rec_baseq_dict_list if x is not None]
     logger.info("Total Record in list of baseq dict:%s", len(rec_baseq_dict_list))
     df2 = pd.DataFarame.from_dict(rec_baseq_dict_list)
-    df2.to_csv(txt_out2,sep="\t",ignore_index=True)
+    df2.to_csv(txt_out2,sep="\t",index=False)
     
     #rec_mapq_df_list = []
     #iterate over statistics, one record at a time
@@ -206,7 +206,7 @@ def generate_features(inputVcf,sampleName,bamFile,refFile,outdir,outFile,process
     rec_mapq_dict_list = [x for x in rec_mapq_dict_list if x is not None]
     logger.info("Total Record in list of mapq df:%s", len(rec_mapq_dict_list))
     df3 = pd.DataFrame(rec_mapq_df_list)
-    df3.to_csv(txt_out3,sep="\t",ignore_index=True)
+    df3.to_csv(txt_out3,sep="\t",index=False)
     #with open(txt_out, 'wb') as output_file:
     #    dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
     #    dict_writer.writeheader()
