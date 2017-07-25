@@ -158,6 +158,7 @@ def generate_features(arg):
     txt_out = os.path.join(arg.outdir,arg.outFile)
     bamFile = arg.bamFile
     refFile = arg.refFile
+    output = mp.Queue()
     #count = 0
     #vc_count= 0
     #txt_fh = open(txt_out, "wb")
@@ -165,8 +166,9 @@ def generate_features(arg):
     rec_dict_list = []
     #iterate over statistics, one record at a time
     pool = mp.Pool(processes=arg.processors)
-    results = pool.apply_async(run_pysamstats, args=[bamFile,refFile,record], for record in vcf_reader)
-    rec_dict_list = [p.get() for p in results]
+    rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
+    #results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
+    #rec_dict_list = [p.get() for p in results]
     #vc_count = vc_count + 1
     #Write output
     #print "Total Count in VCF:",vc_count,"\n","Total Count in pysam:",count,"\n","Total Record in dict:", len(rec_dict_list)
@@ -177,6 +179,7 @@ def generate_features(arg):
     return
 def run_pysamstats(bamFile,reffile,record):
     keys = []
+    rec_dict_list = []
     bam_to_process = pysam.AlignmentFile(args.bamFile)
     keyorder = ['chrom','pos','ref','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
     chromosome = record.CHROM
@@ -194,6 +197,7 @@ def run_pysamstats(bamFile,reffile,record):
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         rec_dict_list.append(rec)
         count = count + 1
+    return(rec_dict_list)
 class MyOrderedDict(collections.OrderedDict):
     def prepend(self, key, value, dict_setitem=dict.__setitem__):
         root = self._OrderedDict__root
