@@ -82,7 +82,7 @@ def main():
 	   
     args = validate_inputs(args)
     
-    generate_features(args)
+    generate_features(args.inputVcf,args.bamFile,args.refFile,args.outdir,args.outfile,args.processors)
     if(args.verbose):
         logger.info("vcf_bam2features: Finished generating flanking sequence")
         #logger.info("vcf_bam2features: Flanking sequence is written in %s", outfile)
@@ -153,11 +153,9 @@ def validate_inputs(args):
             logger.info("vcf_bam2features: %s is a string and will be used in output file", args.sampleName)
     
     return(args)
-def generate_features(arg):
-    vcf_reader = vcf.Reader(open(arg.inputVcf, 'r'))
+def generate_features(inputVcf,bamFile,refFile,outdir,outfile,processors):
+    vcf_reader = vcf.Reader(open(inputVcf, 'r'))
     txt_out = os.path.join(arg.outdir,arg.outFile)
-    bamFile = arg.bamFile
-    refFile = arg.refFile
     output = mp.Queue()
     #count = 0
     #vc_count= 0
@@ -165,7 +163,7 @@ def generate_features(arg):
     #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
     rec_dict_list = []
     #iterate over statistics, one record at a time
-    pool = mp.Pool(processes=arg.processors)
+    pool = mp.Pool(processes=processors)
     rec_dict_list = [pool.apply(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     #results = [pool.apply_async(run_pysamstats, args=(bamFile,refFile,record)) for record in vcf_reader]
     #rec_dict_list = [p.get() for p in results]
