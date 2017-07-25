@@ -144,52 +144,24 @@ def generate_features(args):
     #txt_fh.write("Tumor_Sample_Barcode\tChromosome\tStart_Position\tReference_Allele\tTumor_Seq_Allele1\treads_all\treads_pp\treads_mate_unmapped\treads_mate_other_chr\treads_mate_same_strand\treads_faceaway\treads_softclipped\treads_duplicat\tgc\tmatches\tmismatches\tdeletions\tinsertions\tA/C/T/G/N\tmean_tlen\trms_tlen\tstd_tlen\tread_mapq0\trms_mapq\tmax_mapq\trms_baseq\trms_baseq_matches\trms_baseq_mismatches\n")
     rec_dict_list = []
     keys = []
+    keyorder = ['chrom','pos','ref','reads_all','reads_fwd','reads_rev','reads_pp','reads_pp_fwd','reads_pp_rev','matches','matches_fwd','matches_rev','matches_pp','matches_pp_fwd','matches_pp_rev','mismatches','mismatches_fwd','mismatches_rev','mismatches_pp','mismatches_pp_fwd','mismatches_pp_rev','deletions','deletions_fwd','deletions_rev','deletions_pp','deletions_pp_fwd','deletions_pp_rev','insertions','insertions_fwd','insertions_rev','insertions_pp','insertions_pp_fwd','insertions_pp_rev','A','A_fwd','A_rev','A_pp','A_pp_fwd','A_pp_rev','C','C_fwd','C_rev','C_pp','C_pp_fwd','C_pp_rev','G','G_fwd','G_rev','G_pp','G_pp_fwd','G_pp_rev','T','T_fwd','T_rev','T_pp','T_pp_fwd','T_pp_rev','N','N_fwd','N_rev','N_pp','N_pp_fwd','N_pp_rev']
 # iterate over statistics, one record at a time
     for record in vcf_reader:
         chromosome = record.CHROM
         position = int(record.POS)
         ref = record.REF
         alt = record.ALT[0]
-#         if(len(str(ref)) > len(str(alt))):
-#             start = position
-#             end = position + 2
-#         else:
-#             start = position -1
-#             end = position + 1
         for rec in pysamstats.stat_variation_strand(bam_to_process, args.refFile, chrom=chromosome, start=position, end=position+1,truncate=True):
-            rec = collections.OrderedDict(rec)
+            rec = collections.OrderedDict(sorted(rec.items(),key=lambda i:keyorder.index(i[0])))
             rec = MyOrderedDict(rec)
-            rec.prepend('Tumor_Seq_Allele1',alt)
-            rec.prepend('Reference_Allele',ref)
-            rec.prepend('Start_Position',position)
+            #rec.prepend('Tumor_Seq_Allele1',alt)
+            #rec.prepend('Reference_Allele',ref)
+            #rec.prepend('Start_Position',position)
             rec.prepend('Tumor_Sample_Barcode',args.sampleName)
             #print rec
             keys=rec.keys()
             rec_dict_list.append(rec)
-            #print  args.sampleName, chromosome, ref, alt, rec['chrom'], rec['pos'], rec['reads_all'], rec['reads_pp'], rec['reads_mate_unmapped'],"\n"
-            
-            #print rec['chrom'], rec['pos'], "\n" 
-            #print rec['reads_all'], rec['A/C/T/G/N'], "\n"
-#             rec['reads_pp'], rec['reads_pp_fwd'], rec['reads_pp_rev'], 
-#             rec['reads_mate_unmapped'], rec['reads_mate_unmapped_fwd'], rec['reads_mate_unmapped_rev'], 
-#             rec['reads_mate_other_chr'], rec['reads_mate_other_chr_fwd'], rec['reads_mate_other_chr_rev'],
-#             rec['reads_mate_same_strand'], rec['reads_mate_same_strand_fwd'], rec['reads_mate_same_strand_rev'],
-#             rec['reads_faceaway'], rec['reads_faceaway_fwd'], rec['reads_faceaway_rev'],
-#             rec['reads_softclipped'], rec['reads_softclipped_fwd'], rec['reads_softclipped_rev'],
-#             rec['reads_duplicate'], rec['reads_duplicate_fwd'], rec['reads_duplicate_rev'],
-#             rec['gc'], 
-#             rec['matches'], rec['matches_pp'], 
-#             rec['mismatches'], rec['mismatches_pp'], 
-#             rec['deletions'], rec['deletions_pp'], 
-#             rec['insertions'], rec['insertions_pp'], 
-#             rec['A'], rec['A_pp'], 
-#             rec['C'], rec['C_pp'], 
-#             rec['T'], rec['T_pp'], 
-#             rec['G'], rec['G_pp'], 
-#             rec['N'], rec['N_pp'],
-#             rec['mean_tlen'], rec['mean_tlen_pp'], rec['rms_tlen'], rec['rms_tlen_pp'], rec['std_tlen'], rec['std_tlen_pp'],  
-#             rec['reads_mapq0'], rec['rms_mapq'], rec['rms_mapq_pp'], rec['max_mapq'], rec['max_mapq_pp'], 
-#             rec['rms_baseq'], rec['rms_baseq_matches'], rec['rms_baseq_matches_pp'], rec['rms_baseq_mismatches'], rec['rms_baseq_mismatches_pp']
+    #Write output
     with open(txt_out, 'wb') as output_file:
         dict_writer = csv.DictWriter(output_file, keys, delimiter='\t')
         dict_writer.writeheader()
