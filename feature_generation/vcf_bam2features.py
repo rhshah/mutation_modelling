@@ -88,7 +88,7 @@ except ImportError:
 # Run all sub function    
 def main():
     parser = argparse.ArgumentParser(prog='vcf_bam2features.py', description='This module gets the detailed bam information for a given chromosome, start, end, reference allele and alternate allele and 1bp flanking from a vcf', usage='%(prog)s [options]')
-    parser.add_argument("-o", "--output-file-prefix", action="store", dest="outFile", type=str, required=True, metavar='OutFile', help="Prefix of the output file")
+    parser.add_argument("-o", "--output-file-prefix", action="store", dest="outFile", type=str, default='bam2features',required=False, metavar='OutFile', help="Prefix of the output file")
     parser.add_argument("-b", "--bam-file", action="store", dest="bamFile", type=str, required=True, metavar='BamFile', help="Full Path to the bam file to be used for feature generation")
     parser.add_argument("-r", "--ref-file", action="store", dest="refFile", type=str, required=True, metavar='refFile', help="Full Path to the reference genome file to be used for feature generation")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", help="make lots of noise")
