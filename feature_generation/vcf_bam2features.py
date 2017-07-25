@@ -195,7 +195,6 @@ def run_pysamstats(bamFile,refFile,sampleName,record):
         #print rec
         #print "Org:",chromosome,position,ref,alt,rec['chrom'],rec['pos'],rec['ref'],"\n"
         rec_dict_list.append(rec)
-        count = count + 1
     return(rec_dict_list)
 
 #Make Special Prepend function
