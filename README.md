@@ -23,6 +23,9 @@ python mutation_modelling/feature_generation/vcf_bam2features.py -h
 
 ### vcf_bam2features
 
+- This module gets the detailed bam information for a given chromosome, start, end, reference allele and alternate allele
+- In test for a vcf with ~300k variants using 40 processors it takes ~5 min for 1 bam file.
+
 #### Requirements:
 - pyvcf : [v0.6.7](http://pyvcf.readthedocs.io/en/latest/INTRO.html)
 - pandas : [v0.20.3](http://pandas.pydata.org/)
@@ -36,7 +39,7 @@ python mutation_modelling/feature_generation/vcf_bam2features.py -h
 usage: vcf_bam2features.py [options]
 
 This module gets the detailed bam information for a given chromosome, start,
-end, reference allele and alternate allele and 1bp flanking from a vcf
+end, reference allele and alternate allele
 
 optional arguments:
   -h, --help            show this help message and exit
