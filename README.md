@@ -1,6 +1,24 @@
 # mutation_modelling
 This repo has scripts that helps to generate features for modeling mutations
 
+## Install using virtualenv
+Using [virtualenv](https://virtualenv.pypa.io) you can do the following:
+
+```
+virtualenv -p /path/to/python/python-2.7.10/bin/python mutation_modelling
+cd mutation_modelling
+source bin/activate
+pip install coloredlogs==7.1
+pip install joblib==0.11
+pip install pandas==0.20.3
+pip install pyvcf==0.6.7
+pip install pysam==0.11.2.2
+pip install pysamstats==1.0.1
+git clone https://github.com/rhshah/mutation_modelling.git
+python mutation_modelling/feature_generation/vcf_bam2features.py -h
+
+```
+
 ## feature generation
 
 ### vcf_bam2features
